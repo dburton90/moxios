@@ -335,6 +335,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.headers.Authorization = 'Basic ' + (0, _btoa2.default)(username + ':' + password);
 	    }
 	
+	    // Setup cancel
+	    if (config.cancelToken) {
+	      config.cancelToken.promise.then(function onCanceled(cancel) {
+	        this.reject(cancel);
+	      });
+	    }
+	
 	    // Set xsrf header
 	    if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
 	      var xsrfValue = config.withCredentials || (0, _isURLSameOrigin2.default)(config.url) ? _cookies2.default.read(config.xsrfCookieName) : undefined;

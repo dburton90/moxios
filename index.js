@@ -212,6 +212,13 @@ class Request {
       this.headers.Authorization = 'Basic ' + btoa(username + ':' + password)
     }
 
+    // Setup cancel
+    if (config.cancelToken) {
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        this.reject(cancel);
+      });
+    }
+
     // Set xsrf header
     if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
       let xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
