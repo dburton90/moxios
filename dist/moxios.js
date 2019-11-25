@@ -113,8 +113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    moxios.requests.track(request);
 	
 	    // Check for matching stub to auto respond with
-	
-	    var _loop = function _loop(i, l) {
+	    for (var i = 0, l = moxios.stubs.count(); i < l; i++) {
 	      var stub = moxios.stubs.at(i);
 	      var correctURL = stub.url instanceof RegExp ? stub.url.test(request.url) : stub.url === request.url;
 	      var correctMethod = true;
@@ -125,26 +124,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      if (correctURL && correctMethod) {
 	        // Setup cancel
-	        if (config.cancelToken) {
-	          config.cancelToken.promise.then(function onCanceled(cancel) {
-	            this.reject(cancel);
-	            stub.resolve();
-	          });
-	        }
 	
 	        if (stub.timeout) {
 	          throwTimeout(config);
 	        }
 	        request.respondWith(stub.response);
 	        stub.resolve();
-	        return 'break';
+	        break;
 	      }
-	    };
-	
-	    for (var i = 0, l = moxios.stubs.count(); i < l; i++) {
-	      var _ret = _loop(i, l);
-	
-	      if (_ret === 'break') break;
 	    }
 	  });
 	};
