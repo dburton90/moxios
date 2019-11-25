@@ -113,7 +113,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    moxios.requests.track(request);
 	
 	    // Check for matching stub to auto respond with
-	    for (var i = 0, l = moxios.stubs.count(); i < l; i++) {
+	
+	    var _loop = function _loop(i, l) {
 	      var stub = moxios.stubs.at(i);
 	      var correctURL = stub.url instanceof RegExp ? stub.url.test(request.url) : stub.url === request.url;
 	      var correctMethod = true;
@@ -123,13 +124,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      if (correctURL && correctMethod) {
+	        // Setup cancel
+	        if (config.cancelToken) {
+	          config.cancelToken.promise.then(function onCanceled(cancel) {
+	            this.reject(cancel);
+	            stub.resolve();
+	          });
+	        }
+	
 	        if (stub.timeout) {
 	          throwTimeout(config);
 	        }
 	        request.respondWith(stub.response);
 	        stub.resolve();
-	        break;
+	        return 'break';
 	      }
+	    };
+	
+	    for (var i = 0, l = moxios.stubs.count(); i < l; i++) {
+	      var _ret = _loop(i, l);
+	
+	      if (_ret === 'break') break;
 	    }
 	  });
 	};
@@ -333,13 +348,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var username = config.auth.username || '';
 	      var password = config.auth.password || '';
 	      this.headers.Authorization = 'Basic ' + (0, _btoa2.default)(username + ':' + password);
-	    }
-	
-	    // Setup cancel
-	    if (config.cancelToken) {
-	      config.cancelToken.promise.then(function onCanceled(cancel) {
-	        this.reject(cancel);
-	      });
 	    }
 	
 	    // Set xsrf header

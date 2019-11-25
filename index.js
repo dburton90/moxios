@@ -35,6 +35,14 @@ let mockAdapter = (config) => {
       }
 
       if (correctURL && correctMethod) {
+        // Setup cancel
+        if (config.cancelToken) {
+          config.cancelToken.promise.then(function onCanceled(cancel) {
+            this.reject(cancel);
+            stub.resolve()
+          });
+        }
+
         if (stub.timeout) {
           throwTimeout(config)
         }
@@ -210,13 +218,6 @@ class Request {
       let username = config.auth.username || ''
       let password = config.auth.password || ''
       this.headers.Authorization = 'Basic ' + btoa(username + ':' + password)
-    }
-
-    // Setup cancel
-    if (config.cancelToken) {
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        this.reject(cancel);
-      });
     }
 
     // Set xsrf header
